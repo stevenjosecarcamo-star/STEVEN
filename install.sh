@@ -38,14 +38,20 @@ LINEA="${C}═══════════════════════
 _center() {
     local text="$1"
     local width=60
-    local len=${#text}
+
+    # Quita códigos de color para calcular mejor el centrado
+    local clean
+    clean=$(echo -e "$text" | sed -r 's/\x1B\[[0-9;]*[mK]//g')
+
+    local len=${#clean}
     local spaces=$(( (width - len) / 2 ))
 
     if [[ $spaces -lt 0 ]]; then
         spaces=0
     fi
 
-    printf "%*s%s\n" "$spaces" "" "$text"
+    printf "%*s" "$spaces" ""
+    echo -e "$text"
 }
 
 _titulo() {
