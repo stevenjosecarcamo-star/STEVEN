@@ -51,7 +51,7 @@ _center() {
 _titulo() {
     clear
     echo -e "$LINEA"
-    _center "${BOLD}${C}⚔️ DARKZSAID VPS MANAGER ⚔️${RESET}"
+    _center "⚔️ DARKZSAID VPS MANAGER ⚔️"
     echo -e "$LINEA"
     echo ""
     echo -e "${BOLD}${W}$1${RESET}"
@@ -348,7 +348,7 @@ run_binary() {
 
     echo ""
     echo -e "$LINEA"
-    _center "${G}${BOLD}INICIANDO INSTALADOR PRINCIPAL${RESET}"
+    _center "INICIANDO INSTALADOR PRINCIPAL"
     echo -e "$LINEA"
     echo ""
 
@@ -384,7 +384,7 @@ main() {
 
     echo ""
     echo -e "$LINEA"
-    _center "${G}${BOLD}✔ INSTALACIÓN COMPLETADA EXITOSAMENTE${RESET}"
+    _center "✔ INSTALACIÓN COMPLETADA EXITOSAMENTE"
     echo -e "$LINEA"
     echo ""
 }
