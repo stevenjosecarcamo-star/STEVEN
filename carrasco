@@ -1,11 +1,11 @@
 #!/bin/bash
 
 echo "══════════════════════════════════════════════════════════════"
-echo "        DARKZSAID VPS MANAGER - SCRIPT PRINCIPAL"
+echo "        DARKZSAID VPS MANAGER - ARCHIVO PRINCIPAL"
 echo "══════════════════════════════════════════════════════════════"
 echo ""
-echo "[OK] El archivo principal carrasco se ejecutó correctamente."
-echo "[INFO] Sistema:"
+echo "[OK] carrasco se ejecutó correctamente."
+echo "[INFO] Sistema detectado:"
 grep PRETTY_NAME /etc/os-release
 echo ""
-echo "Instalación principal finalizada."
+echo "Instalación principal finalizada correctamente."
