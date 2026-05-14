@@ -1,11 +1,155 @@
 #!/bin/bash
 
-echo "══════════════════════════════════════════════════════════════"
-echo "        DARKZSAID VPS MANAGER - ARCHIVO PRINCIPAL"
-echo "══════════════════════════════════════════════════════════════"
-echo ""
-echo "[OK] carrasco se ejecutó correctamente."
-echo "[INFO] Sistema detectado:"
-grep PRETTY_NAME /etc/os-release
-echo ""
-echo "Instalación principal finalizada correctamente."
+# ══════════════════════════════════════════════════════════════
+#   DARKZSAID VPS MANAGER - ARCHIVO PRINCIPAL
+# ══════════════════════════════════════════════════════════════
+
+set -o pipefail
+
+RESET="\e[0m"
+BOLD="\e[1m"
+R="\e[31m"
+G="\e[32m"
+Y="\e[33m"
+C="\e[36m"
+W="\e[37m"
+
+LINEA="${C}══════════════════════════════════════════════════════════════${RESET}"
+
+APP_NAME="DarkZsaid VPS Manager"
+APP_DIR="/opt/darkzsaid"
+LOG_FILE="/var/log/darkzsaid-install.log"
+
+titulo() {
+    clear
+    echo -e "$LINEA"
+    echo -e "${C}${BOLD}        ⚔️ DARKZSAID VPS MANAGER - PRINCIPAL ⚔️${RESET}"
+    echo -e "$LINEA"
+    echo ""
+    echo -e "${W}${BOLD}$1${RESET}"
+    echo ""
+}
+
+ok() {
+    echo -e "${G}✔${RESET} $1"
+}
+
+info() {
+    echo -e "${C}[INFO]${RESET} $1"
+}
+
+warn() {
+    echo -e "${Y}[AVISO]${RESET} $1"
+}
+
+error() {
+    echo -e "${R}[ERROR]${RESET} $1"
+}
+
+pausa() {
+    sleep 1
+}
+
+verificar_root() {
+    if [[ "$EUID" -ne 0 ]]; then
+        error "Debes ejecutar este instalador como root."
+        exit 1
+    fi
+
+    ok "Permisos root confirmados"
+}
+
+crear_directorios() {
+    titulo "CREANDO ESTRUCTURA DEL SISTEMA"
+
+    mkdir -p "$APP_DIR"
+    mkdir -p "$APP_DIR/bin"
+    mkdir -p "$APP_DIR/config"
+    mkdir -p "$APP_DIR/logs"
+    mkdir -p "$APP_DIR/backups"
+
+    touch "$LOG_FILE"
+
+    ok "Directorio principal creado: $APP_DIR"
+    ok "Carpetas internas preparadas"
+}
+
+instalar_dependencias_base() {
+    titulo "INSTALANDO DEPENDENCIAS BASE"
+
+    apt-get update -y >> "$LOG_FILE" 2>&1
+
+    apt-get install -y \
+        curl \
+        wget \
+        git \
+        unzip \
+        nano \
+        screen \
+        net-tools \
+        ca-certificates \
+        gnupg \
+        lsb-release \
+        iptables \
+        iproute2 \
+        software-properties-common \
+        >> "$LOG_FILE" 2>&1
+
+    if [[ "$?" -eq 0 ]]; then
+        ok "Dependencias base instaladas correctamente"
+    else
+        error "Falló la instalación de dependencias base"
+        echo "Revisa el log: $LOG_FILE"
+        exit 1
+    fi
+}
+
+detectar_sistema() {
+    titulo "DETECTANDO SISTEMA"
+
+    if [[ -f /etc/os-release ]]; then
+        source /etc/os-release
+        ok "Sistema detectado: $PRETTY_NAME"
+    else
+        error "No se pudo detectar el sistema operativo"
+        exit 1
+    fi
+}
+
+crear_configuracion_base() {
+    titulo "CREANDO CONFIGURACIÓN BASE"
+
+    cat > "$APP_DIR/config/darkzsaid.conf" <<CONFIG
+APP_NAME="DarkZsaid VPS Manager"
+APP_DIR="$APP_DIR"
+INSTALL_DATE="$(date '+%Y-%m-%d %H:%M:%S')"
+SYSTEM="$(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')"
+CONFIG
+
+    ok "Archivo de configuración creado"
+}
+
+mostrar_resumen() {
+    titulo "RESUMEN DE INSTALACIÓN"
+
+    echo -e "${G}✔ Sistema preparado correctamente${RESET}"
+    echo -e "${G}✔ Directorio:${RESET} $APP_DIR"
+    echo -e "${G}✔ Configuración:${RESET} $APP_DIR/config/darkzsaid.conf"
+    echo -e "${G}✔ Logs:${RESET} $LOG_FILE"
+    echo ""
+    echo -e "$LINEA"
+    echo -e "${G}${BOLD}        INSTALADOR PRINCIPAL FINALIZADO${RESET}"
+    echo -e "$LINEA"
+    echo ""
+}
+
+main() {
+    detectar_sistema
+    verificar_root
+    crear_directorios
+    instalar_dependencias_base
+    crear_configuracion_base
+    mostrar_resumen
+}
+
+main "$@"
